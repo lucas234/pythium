@@ -1,4 +1,4 @@
-# @Project: pyium
+# @Project: pythium
 # @Author：Lucas Liu
 # @Time: 2022/11/15 1:53 PM
 import setuptools
@@ -7,21 +7,21 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="pyium",
-    version="1.0.4",
+    name="pythium",
+    version="1.0.0",
     author="lucas",
     author_email="ly_liubo@163.com",
     description="Python based Page Factory.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/lucas234/pyium",
+    url="https://github.com/lucas234/pythium",
     zip_safe=False,
     license='MIT',
     install_requires=[
         'selenium==4.1',
         'Appium-Python-Client==2.7.1',
     ],
-    packages=['pyium'],
+    packages=['pythium'],
     python_requires=">=3",
     classifiers=[
         'Intended Audience :: Developers',

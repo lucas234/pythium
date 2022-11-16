@@ -1,20 +1,23 @@
 #### Pyium 
 ***
-Python based Page Factory design pattern test library, similar to Java's Page Factory pattern, designed to reduce code redundancy, easy to use, with a high degree of scalability.
+Python based Page Factory design pattern test library, similar to Java's Page Factory pattern, 
+designed to reduce code redundancy, easy to use, are very descriptive， make the code more 
+readable and understandable and with a high degree of scalability.
 
-- Supports locate element with @annotation
+- Supports locate element with annotation
 - Supports multiple positioning methods for the same element
 - Supports dynamically locate element
 
 #### Install
 ***
-`pip install pyium`
+`pip install pythium`
 
 #### Usage
 ***
+
 ```python
-from pyium import find_by, android_find_by, ios_find_by
-from pyium import find_all, ios_find_all, android_find_all, Page, by
+from pythium import find_by, android_find_by, ios_find_by
+from pythium import find_all, ios_find_all, android_find_all, Page, by
 from appium.webdriver.webelement import WebElement as MobileElement
 from selenium.webdriver.remote.webelement import WebElement
 from typing import Any, List
@@ -39,7 +42,8 @@ class LoginPage(Page):
 
     @property
     @ios_find_all(by(ios_predicate='value == "Search something"'), by(ios_predicate='value == "Search result"'))
-    @android_find_all(by(android_uiautomator='resourceId("com.app:id/search_txtbox")'), by(android_uiautomator='resourceId("com.app:id/search_txtbox")'))
+    @android_find_all(by(android_uiautomator='resourceId("com.app:id/search_txtbox")'),
+                      by(android_uiautomator='resourceId("com.app:id/search_txtbox")'))
     def find_all_mobile_test(self) -> WebElement: return Any
 
     # for dynamical locator
@@ -49,13 +53,15 @@ class LoginPage(Page):
 
     # for list WebElements
     @find_by(css=".login")
-    def list_web_elements(self) -> List[MobileElement]: ...```
+    def list_web_elements(self) -> List[MobileElement]: ...
 
     def _is_loaded(self):
         print("implement something...")
 
+
 if __name__ == '__main__':
     from selenium import webdriver
+
     driver = webdriver.Chrome()
     login = LoginPage(driver)
     # no @property
@@ -68,11 +74,13 @@ if __name__ == '__main__':
     print(len(login.list_web_elements()))
 ```
 
-`find_all`, `ios_find_all`, `android_find_all` find element with chain
+The`@find_all`, `@ios_find_all`, `@android_find_all` annotations locates the web element using more than one criteria, 
+
+given that at least one criteria match. it uses an OR conditional relationship between the multiple `@xxx_find_by`.
 
 example: `@find_all(by(css=".icon-logo1"), by(id="icon"))` 
 
 first will find element `by(css=".icon-logo1")`, if found, return `WebElement`; 
 
 if not found, will find element `by(id="icon")`, if found, return `WebElement`, if not found, will raise `Exception`.
-    
+ 

@@ -1,4 +1,4 @@
-# @Project: pyium
+# @Project: pythium
 # @Author：Lucas Liu
 # @Time: 2022/10/28 9:15 AM
 from appium.webdriver.common.appiumby import AppiumBy
