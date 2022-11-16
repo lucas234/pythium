@@ -1,9 +1,78 @@
 #### Pyium 
 ***
-基于 selenium/appium 的 Page Factory 设计模式测试库, 类似于Java的Page Factory模式，旨在减少代码冗余，简单易用，具有高度的可扩展能力。
+Python based Page Factory design pattern test library, similar to Java's Page Factory pattern, designed to reduce code redundancy, easy to use, with a high degree of scalability.
 
-- 支持以@annotation的方式定义元素
-- 支持同一个元素多种定位方式
-- 支持动态的元素定位
+- Supports locate element with @annotation
+- Supports multiple positioning methods for the same element
+- Supports dynamically locate element
 
 #### Install
+***
+`pip install pyium`
+
+#### Usage
+***
+```python
+from pyium import find_by, android_find_by, ios_find_by
+from pyium import find_all, ios_find_all, android_find_all, Page, by
+from appium.webdriver.webelement import WebElement as MobileElement
+from selenium.webdriver.remote.webelement import WebElement
+from typing import Any, List
+
+
+class LoginPage(Page):
+
+    @find_by(css=".search")
+    @ios_find_by(ios_predicate='value == "Search something"')
+    @android_find_by(android_uiautomator='resourceId("com.app:id/search_txtbox")')
+    def search_input(self) -> WebElement: ...
+
+    @property
+    @find_by(css=".search")
+    @ios_find_by(ios_predicate='value == "Search something"')
+    @android_find_by(android_uiautomator='resourceId("com.app:id/search_txtbox")')
+    def search_input_with_property(self) -> WebElement: ...
+
+    @property
+    @find_all(by(css=".icon-logo1"), by(css=".icon-logo"))
+    def find_all_web_test(self) -> WebElement: return Any
+
+    @property
+    @ios_find_all(by(ios_predicate='value == "Search something"'), by(ios_predicate='value == "Search result"'))
+    @android_find_all(by(android_uiautomator='resourceId("com.app:id/search_txtbox")'), by(android_uiautomator='resourceId("com.app:id/search_txtbox")'))
+    def find_all_mobile_test(self) -> WebElement: return Any
+
+    # for dynamical locator
+    @find_by(xpath="//div[{n}]/a[{k}]/div[{m}]/{f}")
+    @ios_find_by(xpath="//div[1]/a[{n}]/div[{k}]")
+    def dynamical_locator(self, n, k, m=4, f=6) -> WebElement: ...
+
+    # for list WebElements
+    @find_by(css=".login")
+    def list_web_elements(self) -> List[MobileElement]: ...```
+
+    def _is_loaded(self):
+        print("implement something...")
+
+if __name__ == '__main__':
+    from selenium import webdriver
+    driver = webdriver.Chrome()
+    login = LoginPage(driver)
+    # no @property
+    login.search_input.click()
+    # with @property
+    login.search_input_with_property.click()
+    # for dynamical locator
+    login.dynamical_locator(2, 3, 4, 5).click()
+    # for list WebElement
+    print(len(login.list_web_elements()))
+```
+
+`find_all`, `ios_find_all`, `android_find_all` find element with chain
+
+example: `@find_all(by(css=".icon-logo1"), by(id="icon"))` 
+
+first will find element `by(css=".icon-logo1")`, if found, return `WebElement`; 
+
+if not found, will find element `by(id="icon")`, if found, return `WebElement`, if not found, will raise `Exception`.
+    
