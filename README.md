@@ -65,7 +65,7 @@ if __name__ == '__main__':
     driver = webdriver.Chrome()
     login = LoginPage(driver)
     # no @property
-    login.search_input.click()
+    login.search_input().click()
     # with @property
     login.search_input_with_property.click()
     # for dynamical locator
