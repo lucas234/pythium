@@ -167,4 +167,6 @@
 
 `//td[preceding-sibling::td[contains(.,"t")]]`
 
+按搜索结果的索引取值：`(//div[@class="g-grid"])[1]`
+
 

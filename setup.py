@@ -20,6 +20,7 @@ setuptools.setup(
     install_requires=[
         'selenium==4.1',
         'Appium-Python-Client==2.7.1',
+        'retrying==1.3.4'
     ],
     packages=['pythium'],
     python_requires=">=3",
