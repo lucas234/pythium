@@ -17,6 +17,7 @@ from retrying import retry
 from typing import Literal
 from pythium.utils import Utils
 from pythium.actions import Actions
+from pythium.assertions import ElemAssertions, ElemsAssertions
 
 
 def retry_if_exceptions(exception):
@@ -38,11 +39,14 @@ class Elements:
             _locators.pop('driver')
         self._locator = Utils.valid_locator(_locators)[:2]
         self._driver = driver
-        self._action = Actions(self._driver)
+        if driver:
+            self._action = Actions(self._driver)
+            self.elems = self._find_elements()
 
     def __get__(self, obj, owner):
         """Gets the element object"""
         self._driver = obj.driver
+        self._action = Actions(self._driver)
         self.elems = self._find_elements()
         return self
 
@@ -56,6 +60,11 @@ class Elements:
             print(nse)
             return self._driver.find_elements(*self._locator)
 
+    @property
+    def expect(self) -> ElemsAssertions:
+        return ElemsAssertions(self)
+
+    @property
     def count(self):
         return len(self.elems)
 
@@ -88,19 +97,26 @@ class Element:
             _locators.pop('driver')
         self._locator = Utils.valid_locator(_locators)[:2]
         self._driver = driver
-        self._action = Actions(self._driver)
+        if driver:
+            self._action = Actions(self._driver)
+            self.elem = self._find_element()
 
     def __get__(self, obj, owner):
         """Gets the element object"""
         self._driver = obj.driver
+        self._action = Actions(self._driver)
         self.elem = self._find_element()
         return self
 
     def __set__(self, obj, value):
         """Sets the text to the value supplied"""
         self.__get__(obj, obj.__class__)
-        self.elem.clear()
-        self.elem.send_keys(value)
+        self._find_element().clear()
+        self._find_element().send_keys(value)
+
+    @property
+    def expect(self) -> ElemAssertions:
+        return ElemAssertions(self)
 
     def _find_element(self, timeout=_TIMEOUT):
         try:
@@ -143,7 +159,7 @@ class Element:
             return False
 
     def clear(self):
-        self.elem.clear()
+        self._find_element().clear()
         return self
 
     def click_if_exist(self, timeout=_TIMEOUT, by: Literal['js', 'default', 'action'] = 'default'):
@@ -160,7 +176,7 @@ class Element:
             self.w3c_actions.pointer_action.click(self.elem)
             self.w3c_actions.perform()
         elif by == 'default':
-            self.elem.click()
+            self._find_element().click()
         else:
             raise Exception("'by' only support the following strategies: ['js', 'default', 'action']")
         return self
@@ -169,12 +185,18 @@ class Element:
         self._find_element().send_keys(value)
         return self
 
+    def get_attribute(self, name):
+        return self._find_element().get_attribute(name)
+
+    def get_property(self, name):
+        return self._find_element().get_property(name)
+
     @property
     def text(self):
         if self._action.is_web_platform:
-            return self.elem.get_attribute('textContent')
+            return self._find_element().get_attribute('textContent')
         if self._action.is_mobile_platform:
-            return self.elem.text
+            return self._find_element().text
 
     def scroll_into_view(self, direction='down', swipe_max_times=5, top_offset=100, bottom_offset=100):
         if self._action.is_web_platform:
@@ -195,13 +217,3 @@ class Element:
         actions = ActionChains(self._driver)
         actions.w3c_actions = ActionBuilder(self._driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
         return actions.w3c_actions
-
-
-if __name__ == '__main__':
-    e = Element(css=123)
-    print(e._TIMEOUT)
-    print(e._locator)
-    setattr(e, '_locator', ("e", "234"))
-    print(e._locator)
-    a = Element(**{'css': 123})
-    print(a._locator)

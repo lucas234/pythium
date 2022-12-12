@@ -14,6 +14,8 @@ from appium.webdriver.webelement import WebElement as MobileElement
 from pythium.objects import Element, Elements
 from pythium.actions import Actions
 from pythium.utils import Utils
+from pythium.assertions import PageAssertions
+from pythium.http_session import HttpSession
 
 
 def _handle_return_type(return_type, driver: WebDriver, locator):
@@ -121,6 +123,10 @@ class Page:
         self.locators = {}
         self.action = Actions(self.driver)
 
+    @abstractmethod
+    def _is_loaded(self):
+        pass
+
     def goto(self, url):
         self.driver.get(url)
         return self
@@ -129,7 +135,17 @@ class Page:
         self.action.open_deep_link(link, bundle_id)
         return self
 
-    @abstractmethod
-    def _is_loaded(self):
-        pass
+    @property
+    def expect(self) -> PageAssertions:
+        return PageAssertions(self.driver)
+
+    @property
+    def request(self):
+        session = HttpSession()
+        session.cookies.update(self._get_cookies())
+        return session
+
+    def _get_cookies(self) -> dict:
+        cookies = {cookie['name']: cookie['value'] for cookie in self.driver.get_cookies()}
+        return cookies
 
