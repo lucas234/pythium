@@ -14,6 +14,7 @@ import time
 from typing import Literal
 from pythium.exceptions import IllegalArgumentException
 from pythium.utils import Utils
+from commands import IosCommands, AndroidCommands
 
 
 class Actions(object):
@@ -29,8 +30,7 @@ class Actions(object):
         except TimeoutException as te:
             if throw_exception:
                 raise te
-            else:
-                print(te)
+            print(te)
 
     def is_(self, locator, ecs, timeout=_TIMEOUT):
         try:
@@ -64,6 +64,19 @@ class Actions(object):
             return True
         else:
             return False
+
+    def highlight(self, element, elapsed=800):
+        """only support web UI"""
+        if not self.is_web_platform:
+            return
+        previous_style = element.get_attribute("style")
+        color = '#00cc66'
+        style = f"arguments[0].setAttribute('style', 'border: 2px solid {color}; font-weight: bold;');"
+        self._driver.execute_script(style, element)
+        restore_script = f"var target = arguments[0];var previousStyle = arguments[1];" \
+                         f"setTimeout(function(){{ target.setAttribute('style', previousStyle);}}, {elapsed});"
+        # remove highlight
+        self._driver.execute_script(restore_script, element, previous_style)
 
     def perform_search(self):
         if self.is_android_platform:
@@ -130,6 +143,7 @@ class Actions(object):
 
     def scroll_into_view_ios(self, locator):
         self._driver.find_element(*locator).click()
+        self.wait(1)
         try:
             y = self._driver.find_element(*locator).rect['y']
             height = self._driver.get_window_size()["height"]
@@ -140,15 +154,40 @@ class Actions(object):
         except NoSuchElementException:
             pass
 
-    def open_deep_link(self, link: str, bundle_id=None):
+    def open_deep_link(self, link: str, ios_bundle_id=None):
         """
         only for mobile platform
         """
+        bundle_id = ios_bundle_id or self._driver.execute_script(f'mobile: {IosCommands.ActiveAppInfo}')['bundleId']
+
+        def _by_safari(deep_link):
+            prefix = f'{bundle_id}://'
+            self._driver.execute_script(f'mobile: {IosCommands.TerminateApp}', {"bundleId": 'com.apple.mobilesafari'})
+            self._driver.execute_script(f'mobile: {IosCommands.LaunchApp}', {"bundleId": 'com.apple.mobilesafari'})
+            url_button = (AppiumBy.IOS_PREDICATE, 'type == "XCUIElementTypeButton" and name CONTAINS "URL" or label == "Address"')
+            url_field = (AppiumBy.IOS_PREDICATE, 'type == "XCUIElementTypeTextField" and name CONTAINS "URL"')
+            if not self._driver.is_keyboard_shown():
+                time.sleep(4)
+                self._driver.find_element(*url_button).click()
+            self._driver.find_element(*url_field).send_keys(
+                f'{prefix}{Utils.remove_scheme(deep_link)}\uE007')
+            time.sleep(2)
+            open_ = (AppiumBy.IOS_PREDICATE, 'name == "Open" AND type == "XCUIElementTypeButton"')
+            self._driver.find_element(*open_).click()
+
         if self.is_ios_platform:
-            self._driver.execute_script('mobile: terminateApp', {"bundleId": bundle_id})
-            self._driver.get(f'{bundle_id}://{Utils.remove_scheme(link)}')
+            self._driver.execute_script(f'mobile: {IosCommands.TerminateApp}', {"bundleId": bundle_id})
+            # on ios platform, driver.get(link) only can use emulator
+            # on real device, need to use other method
+            is_simulator = self._driver.execute_script(f'mobile: {IosCommands.DeviceInfo}')['isSimulator']
+            if is_simulator:
+                self._driver.get(f'{bundle_id}://{Utils.remove_scheme(link)}')
+            else:
+                _by_safari(link)
+
         elif self.is_android_platform:
             self._driver.terminate_app(self._driver.current_package)
+            # if driver.get(link) is not valid, then use execute_script
             self._driver.get(link)
             # driver.execute_script('mobile:deepLink', {'url': link, 'package': driver.current_package})
         else:
@@ -189,5 +228,5 @@ class Actions(object):
         self._driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, operation_selector)
 
     @classmethod
-    def wait(cls, seconds):
+    def wait(cls, seconds=5):
         time.sleep(seconds)

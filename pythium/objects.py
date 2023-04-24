@@ -71,7 +71,7 @@ class Elements:
     def index(self, n):
         return self.elems[n]
 
-    def wait(self, seconds):
+    def wait(self, seconds=5):
         self._action.wait(seconds)
         return self
 
@@ -120,13 +120,19 @@ class Element:
 
     def _find_element(self, timeout=_TIMEOUT):
         try:
-            return WebDriverWait(self._driver, timeout).until(ec.presence_of_element_located(self._locator))
+            elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_element_located(self._locator))
+            self._action.highlight(elem)
+            return elem
         except TimeoutException as te:
             print(te)
-            return self._driver.find_element(*self._locator)
+            elem = self._driver.find_element(*self._locator)
+            self._action.highlight(elem)
+            return elem
         except NoSuchElementException as nse:
             print(nse)
-            return self._driver.find_element(*self._locator)
+            elem = self._driver.find_element(*self._locator)
+            self._action.highlight(elem)
+            return elem
 
     def wait_until_visible(self, timeout=_TIMEOUT, throw_exception=True):
         self._action.wait_util(self._locator, ec.visibility_of_element_located, timeout, throw_exception)
@@ -136,7 +142,7 @@ class Element:
         self._action.wait_util(self._locator, ec.element_to_be_clickable, timeout, throw_exception)
         return self
 
-    def wait(self, seconds):
+    def wait(self, seconds=5):
         self._action.wait(seconds)
         return self
 

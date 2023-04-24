@@ -131,8 +131,8 @@ class Page:
         self.driver.get(url)
         return self
 
-    def open_deeplink(self, link, bundle_id):
-        self.action.open_deep_link(link, bundle_id)
+    def open_deeplink(self, link, ios_bundle_id=None):
+        self.action.open_deep_link(link, ios_bundle_id)
         return self
 
     @property

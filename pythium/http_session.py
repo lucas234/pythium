@@ -6,6 +6,7 @@
 # @Software: PyCharm
 from requests import Session, Response
 import allure
+import os
 import json
 from functools import partial
 from requests.adapters import HTTPAdapter
@@ -65,31 +66,38 @@ class HttpSession(Session):
 
     @staticmethod
     def _logging_hook(response: Response, *args, **kwargs):
-        # request
-        if isinstance(response.request.body, str):
-            request_body = response.request.body
-        else:
-            request_body = json.loads(response.request.body.decode('utf-8')) if response.request.body else {}
-        request_headers = response.request.headers.__dict__
-        request_headers.pop('_store')
-        request_msg = f"\n< ### Request Info ###\n" \
-                      f"< {response.request.method} {response.request.url}\n" \
-                      f"< headers: {json.dumps(request_headers, indent=4, sort_keys=True)}\n" \
-                      f"< body: {json.dumps(request_body, indent=4, sort_keys=True, ensure_ascii=False)}\n"
-        logger.info(request_msg)
-        allure.attach(request_msg, name=f"Request info--{urlparse(response.request.url).path}",
-                      attachment_type=allure.attachment_type.JSON)
-        # response
+        is_log = True if os.environ.get('LOG', 'false').lower() == 'true' else False
+        # if response.ok and not is_log: # only print log(not success request)
+        if not is_log:
+            return
         try:
-            response_body = json.dumps(response.json(), indent=4, sort_keys=True, ensure_ascii=False)
-        except ValueError:
-            response_body = response.text
-        response_msg = f"\n> ### Response Info ###\n" \
-                       f"> status_code: {response.status_code}\n" \
-                       f"> duration: {response.elapsed.seconds}s\n"\
-                       f"> text: {response_body}\n"
-        logger.info(response_msg)
-        allure.attach(response_msg, name=f"Response info--{urlparse(response.request.url).path}",
-                      attachment_type=allure.attachment_type.JSON)
+            # request
+            if isinstance(response.request.body, str):
+                request_body = response.request.body
+            else:
+                request_body = json.loads(response.request.body.decode('utf-8')) if response.request.body else {}
+            request_headers = response.request.headers.__dict__
+            request_headers.pop('_store')
+            request_msg = f"\n< ### Request Info ###\n" \
+                          f"< {response.request.method} {response.request.url}\n" \
+                          f"< headers: {json.dumps(request_headers, indent=4, sort_keys=True)}\n" \
+                          f"< body: {json.dumps(request_body, indent=4, sort_keys=True, ensure_ascii=False)}\n"
+            logger.info(request_msg)
+            allure.attach(request_msg, name=f"Request info--{urlparse(response.request.url).path}",
+                          attachment_type=allure.attachment_type.JSON)
+            # response
+            try:
+                response_body = json.dumps(response.json(), indent=4, sort_keys=True, ensure_ascii=False)
+            except ValueError:
+                response_body = response.text
+            response_msg = f"\n> ### Response Info ###\n" \
+                           f"> status_code: {response.status_code}\n" \
+                           f"> duration: {response.elapsed.seconds}s\n"\
+                           f"> text: {response_body}\n"
+            logger.info(response_msg)
+            allure.attach(response_msg, name=f"Response info--{urlparse(response.request.url).path}",
+                          attachment_type=allure.attachment_type.JSON)
+        except Exception as e:
+            logger.info(f"logging hook error: {e}")
 
 

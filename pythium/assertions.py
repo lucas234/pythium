@@ -7,7 +7,6 @@
 from selenium.webdriver.remote.webdriver import WebDriver
 import re
 from typing import TypedDict
-from pythium import Element, Elements
 
 
 class ExpectOptions(TypedDict, total=False):
@@ -38,6 +37,7 @@ class BaseAssertions(object):
         if self._is_not:
             message = message.replace("expected to", "expected not to")
             result = not result
+        expected = expected or expected_number
         assert result, f"{message} {expected if expected else ''}, the actual is: {actual}"
 
 
@@ -66,7 +66,7 @@ class PageAssertions(BaseAssertions):
 
 
 class ElemsAssertions(BaseAssertions):
-    def __init__(self, elems: Elements, is_not: bool = False):
+    def __init__(self, elems, is_not: bool = False):
         super(ElemsAssertions, self).__init__(is_not)
         self._elems = elems
 
@@ -84,7 +84,7 @@ class ElemsAssertions(BaseAssertions):
 
 class ElemAssertions(BaseAssertions):
 
-    def __init__(self, elem: Element, is_not: bool = False):
+    def __init__(self, elem, is_not: bool = False):
         super(ElemAssertions, self).__init__(is_not)
         self._elem = elem
 
@@ -164,7 +164,7 @@ class ElemAssertions(BaseAssertions):
 
     def to_have_text(self, expected):
         text = self._elem.text
-        self._expect_impl(text, "Elem expected to contain text:", ExpectOptions(expected_text=expected, is_contain=False))
+        self._expect_impl(text, "Elem expected to have text:", ExpectOptions(expected_text=expected, is_contain=False))
 
     def not_to_have_text(self, expected):
         self._not.to_have_text(expected)
