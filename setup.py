@@ -7,8 +7,8 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="pythium",
-    version="1.0.0",
+    name="pyium",
+    version="1.0.6",
     author="lucas",
     author_email="ly_liubo@163.com",
     description="Python based Page Factory.",
@@ -20,6 +20,10 @@ setuptools.setup(
     install_requires=[
         'selenium==4.1',
         'Appium-Python-Client==2.7.1',
+        'retrying==1.3.4',
+        'requests==2.28.1',
+        'allure-python-commons==2.9.43',
+        'loguru==0.5.3'
     ],
     packages=['pythium'],
     python_requires=">=3",
