@@ -21,7 +21,7 @@ setuptools.setup(
         'selenium==4.1',
         'Appium-Python-Client==2.7.1',
         'retrying==1.3.4',
-        'requests==2.28.1',
+        'requests==2.31.0',
         'allure-python-commons==2.9.43',
         'loguru==0.5.3'
     ],
