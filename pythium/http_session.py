@@ -17,7 +17,7 @@ from loguru import logger
 
 class HttpSession(Session):
     PROXIES = {"http": "", "https": ""}
-    TIMEOUT = 20
+    TIMEOUT = 10
 
     def __init__(self, base_url=None):
         self.base_url = base_url
@@ -35,12 +35,8 @@ class HttpSession(Session):
         url = urljoin(self.base_url, url)
         return super(HttpSession, self).request(method, url, *args, **kwargs)
 
-    def _set_header(self, header=None):
-        if header is None:
-            header = {
-                "Content-Type": "application/json"
-            }
-        self.header = header
+    def _set_header(self, header):
+        self.headers.update(header)
 
     def _set_proxy(self, proxies):
         self.proxies.update(proxies)
