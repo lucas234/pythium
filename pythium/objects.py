@@ -5,7 +5,7 @@
 # @Time: 2022/11/25 10:55 AM
 # @Software: PyCharm
 from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotVisibleException
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions import interaction
@@ -21,7 +21,8 @@ from pythium.assertions import ElemAssertions, ElemsAssertions
 
 
 def retry_if_exceptions(exception):
-    exceptions = [ElementClickInterceptedException, StaleElementReferenceException]
+    exceptions = [ElementClickInterceptedException, StaleElementReferenceException,
+                  ElementNotVisibleException, NoSuchElementException]
     return any([isinstance(exception, e) for e in exceptions])
 
 
@@ -177,7 +178,10 @@ class Element:
     def click(self, by: Literal['js', 'default', 'action'] = 'default'):
         if by == "js":
             # only support web
-            self._driver.execute_script("arguments[0].click();", self.elem)
+            if self._action.is_web_platform:
+                self._driver.execute_script("arguments[0].click();", self.elem)
+            else:
+                raise Exception("Clicking element by js only support web platform")
         elif by == 'action':
             self.w3c_actions.pointer_action.click(self.elem)
             self.w3c_actions.perform()

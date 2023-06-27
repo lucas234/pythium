@@ -7,8 +7,8 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="pyium",
-    version="1.0.6",
+    name="pythium",
+    version="1.1.0",
     author="lucas",
     author_email="ly_liubo@163.com",
     description="Python based Page Factory.",
