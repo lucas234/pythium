@@ -14,7 +14,7 @@ import time
 from typing import Literal
 from pythium.exceptions import IllegalArgumentException
 from pythium.utils import Utils
-from commands import IosCommands, AndroidCommands
+from pythium.commands import IosCommands, AndroidCommands
 
 
 class Actions(object):
