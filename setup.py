@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="pythium",
-    version="1.1.0",
+    version="1.1.1",
     author="lucas",
     author_email="ly_liubo@163.com",
     description="Python based Page Factory.",
