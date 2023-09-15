@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="pythium",
-    version="1.1.1",
+    version="1.1.2",
     author="lucas",
     author_email="ly_liubo@163.com",
     description="Python based Page Factory.",
@@ -23,7 +23,8 @@ setuptools.setup(
         'retrying==1.3.4',
         'requests==2.31.0',
         'allure-python-commons==2.9.43',
-        'loguru==0.5.3'
+        'loguru==0.5.3',
+        'webdriver-manager==4.0.0'
     ],
     packages=['pythium'],
     python_requires=">=3",
