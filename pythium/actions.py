@@ -14,7 +14,7 @@ import time
 from typing import Literal
 from pythium.exceptions import IllegalArgumentException
 from pythium.utils import Utils
-from commands import IosCommands, AndroidCommands
+from pythium.commands import IosCommands, AndroidCommands
 
 
 class Actions(object):
@@ -35,6 +35,7 @@ class Actions(object):
     def is_(self, locator, ecs, timeout=_TIMEOUT):
         try:
             WebDriverWait(self._driver, timeout).until(ecs(locator))
+
             return True
         except TimeoutException as te:
             print(te)
@@ -230,3 +231,4 @@ class Actions(object):
     @classmethod
     def wait(cls, seconds=5):
         time.sleep(seconds)
+

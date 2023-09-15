@@ -18,6 +18,8 @@ from typing import Literal
 from pythium.utils import Utils
 from pythium.actions import Actions
 from pythium.assertions import ElemAssertions, ElemsAssertions
+from pythium.emoji import Emoji
+from loguru import logger
 
 
 def retry_if_exceptions(exception):
@@ -52,14 +54,21 @@ class Elements:
         return self
 
     def _find_elements(self, timeout=_TIMEOUT):
+        by, value = self._locator
         try:
-            return WebDriverWait(self._driver, timeout).until(ec.presence_of_all_elements_located(self._locator))
+            elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_all_elements_located(self._locator))
+            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}={value}.")
+            return elem
         except TimeoutException as te:
-            print(te)
-            return self._driver.find_elements(*self._locator)
+            logger.exception(te)
+            elem = self._driver.find_elements(*self._locator)
+            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}={value}.")
+            return elem
         except NoSuchElementException as nse:
-            print(nse)
-            return self._driver.find_elements(*self._locator)
+            logger.exception(nse)
+            elem = self._driver.find_elements(*self._locator)
+            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}={value}.")
+            return elem
 
     @property
     def expect(self) -> ElemsAssertions:
@@ -74,14 +83,19 @@ class Elements:
 
     def wait(self, seconds=5):
         self._action.wait(seconds)
+        logger.info(f"{Emoji.HOURGLASS_NOT_DONE} wait {seconds}s")
         return self
 
     @property
     def texts(self):
         if self._action.is_web_platform:
-            return [elem.get_attribute('textContent') for elem in self.elems]
+            texts = [elem.get_attribute('textContent') for elem in self.elems]
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} texts: {texts}.")
+            return texts
         if self._action.is_mobile_platform:
-            return [elem.text for elem in self.elems]
+            texts = [elem.text for elem in self.elems]
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} texts: {texts}.")
+            return texts
 
 
 class Element:
@@ -120,18 +134,22 @@ class Element:
         return ElemAssertions(self)
 
     def _find_element(self, timeout=_TIMEOUT):
+        by, value = self._locator
         try:
             elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_element_located(self._locator))
+            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}={value}.")
             self._action.highlight(elem)
             return elem
         except TimeoutException as te:
-            print(te)
+            logger.exception(te)
             elem = self._driver.find_element(*self._locator)
+            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}={value}.")
             self._action.highlight(elem)
             return elem
         except NoSuchElementException as nse:
-            print(nse)
+            logger.exception(nse)
             elem = self._driver.find_element(*self._locator)
+            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}={value}.")
             self._action.highlight(elem)
             return elem
 
@@ -159,14 +177,16 @@ class Element:
     def is_exist(self, timeout=_TIMEOUT):
         try:
             self._find_element(timeout)
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} is_displayed().")
             return True
         except Exception as ex:
             by, value = self._locator
-            print(f"element: by.{by}={value} is not exist! original exception: {ex}")
+            logger.info(f"{Emoji.CROSS_MARK} element: by.{by}={value} is not exist! original exception: {ex}")
             return False
 
     def clear(self):
         self._find_element().clear()
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} clear().")
         return self
 
     def click_if_exist(self, timeout=_TIMEOUT, by: Literal['js', 'default', 'action'] = 'default'):
@@ -180,50 +200,67 @@ class Element:
             # only support web
             if self._action.is_web_platform:
                 self._driver.execute_script("arguments[0].click();", self.elem)
+                logger.info(f"{Emoji.CHECK_MARK_BUTTON} click() by js.")
             else:
-                raise Exception("Clicking element by js only support web platform")
+                raise Exception(f"{Emoji.EXCEPTION} Clicking element by js only support web platform")
         elif by == 'action':
             self.w3c_actions.pointer_action.click(self.elem)
             self.w3c_actions.perform()
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} click() by action.")
         elif by == 'default':
             self._find_element().click()
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} click().")
         else:
-            raise Exception("'by' only support the following strategies: ['js', 'default', 'action']")
+            raise Exception(f"{Emoji.EXCEPTION} 'by' only support the following strategies: ['js', 'default', 'action']")
         return self
 
     def send_keys(self, value):
         self._find_element().send_keys(value)
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} send_keys('{value}').")
         return self
 
     def get_attribute(self, name):
-        return self._find_element().get_attribute(name)
+        value = self._find_element().get_attribute(name)
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} get_attribute('{name}') -> {value}.")
+        return value
 
     def get_property(self, name):
-        return self._find_element().get_property(name)
+        value = self._find_element().get_property(name)
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} get_property('{name}') -> {value}.")
+        return value
 
     @property
     def text(self):
         if self._action.is_web_platform:
-            return self._find_element().get_attribute('textContent')
+            text = self._find_element().get_attribute('textContent')
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} text: {text}.")
+            return text
         if self._action.is_mobile_platform:
-            return self._find_element().text
+            text = self._find_element().text
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} text: {text}.")
+            return text
 
     def scroll_into_view(self, direction='down', swipe_max_times=5, top_offset=100, bottom_offset=100):
         if self._action.is_web_platform:
             self._driver.execute_script("arguments[0].scrollIntoView(true);", self.elem)
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} scroll into view.")
         if self._action.is_mobile_platform:
             self._action.scroll_into_view(self._locator, direction, swipe_max_times, top_offset, bottom_offset)
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} scroll {direction} into view.")
         return self
 
     def switch_to_iframe(self, timeout=_TIMEOUT):
         WebDriverWait(self._driver, timeout).until(ec.frame_to_be_available_and_switch_to_it(self._locator))
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} switch to iframe.")
 
     def switch_to_default_content(self):
         self._driver.switch_to.default_content()
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} switch to default content.")
         return self
 
     @property
     def w3c_actions(self):
         actions = ActionChains(self._driver)
         actions.w3c_actions = ActionBuilder(self._driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} ready to perform w3c actions.")
         return actions.w3c_actions

@@ -16,6 +16,8 @@ from pythium.actions import Actions
 from pythium.utils import Utils
 from pythium.assertions import PageAssertions
 from pythium.http_session import HttpSession
+from pythium.emoji import Emoji
+from loguru import logger
 
 
 def _handle_return_type(return_type, driver: WebDriver, locator):
@@ -26,7 +28,7 @@ def _handle_return_type(return_type, driver: WebDriver, locator):
     elif issubclass(return_type, Element) or issubclass(return_type, Elements):
         return return_type(**locator[1], driver=driver)
     else:
-        raise Exception("Only support the WebElement, [WebElement], Element and Elements!")
+        raise Exception(f"{Emoji.EXCEPTION} Only support the WebElement, [WebElement], Element and Elements!")
 
 
 def find_by(id_=None, css=None, name=None, xpath=None, partial_link_text=None,
@@ -129,10 +131,12 @@ class Page:
 
     def goto(self, url):
         self.driver.get(url)
+        logger.info(f"{Emoji.LINK} navigate to {url}.")
         return self
 
     def open_deeplink(self, link, ios_bundle_id=None):
         self.action.open_deep_link(link, ios_bundle_id)
+        logger.info(f"{Emoji.LINK} open deeplink: {link}.")
         return self
 
     @property
@@ -149,3 +153,20 @@ class Page:
         cookies = {cookie['name']: cookie['value'] for cookie in self.driver.get_cookies()}
         return cookies
 
+
+# not for PO
+def elem_with_driver(f, driver=None):
+    def _find_by(id_=None, css=None, name=None, xpath=None, partial_link_text=None, link_text=None,
+                 class_name=None, tag_name=None, image=None, custom=None, android_uiautomator=None,
+                 android_viewtag=None, android_data_matcher=None, android_view_matcher=None,
+                 windows_ui_automation=None, accessibility_id=None, ios_uiautomation=None,
+                 ios_class_chain=None, ios_predicate=None) -> Union[Element, Elements]:
+        kwargs = Utils.get_kwargs()
+        kwargs = {k: v for k, v in kwargs.items() if v}
+        Utils.valid_locator(kwargs)
+
+        def decorator(func):
+            kwargs['driver'] = driver
+            return func(**kwargs)
+        return decorator(f)
+    return _find_by
