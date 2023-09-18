@@ -21,6 +21,7 @@ from pythium import find_all, ios_find_all, android_find_all, Page, by
 from appium.webdriver.webelement import WebElement as MobileElement
 from selenium.webdriver.remote.webelement import WebElement
 from typing import Any, List
+from pythium import Browsers
 
 
 class LoginPage(Page):
@@ -60,9 +61,7 @@ class LoginPage(Page):
 
 
 if __name__ == '__main__':
-    from selenium import webdriver
-
-    driver = webdriver.Chrome()
+    driver = Browsers.chrome()
     login = LoginPage(driver)
     # no @property
     login.search_input().click()

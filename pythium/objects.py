@@ -13,13 +13,14 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webdriver import WebDriver
+from appium.webdriver.webdriver import WebDriver as MobileDriver
 from retrying import retry
-from typing import Literal
+from typing import Literal, Union
+from loguru import logger
 from pythium.utils import Utils
 from pythium.actions import Actions
 from pythium.assertions import ElemAssertions, ElemsAssertions
 from pythium.emoji import Emoji
-from loguru import logger
 
 
 def retry_if_exceptions(exception):
@@ -106,7 +107,7 @@ class Element:
                  class_name=None, tag_name=None, image=None, custom=None, android_uiautomator=None,
                  android_viewtag=None, android_data_matcher=None, android_view_matcher=None,
                  windows_ui_automation=None, accessibility_id=None, ios_uiautomation=None, ios_class_chain=None,
-                 ios_predicate=None, driver: WebDriver = None):
+                 ios_predicate=None, driver: Union[WebDriver, MobileDriver] = None):
         _locators = {k: v for k, v in Utils.get_kwargs().items() if v}
         if 'driver' in _locators:
             _locators.pop('driver')
@@ -195,23 +196,33 @@ class Element:
         return self
 
     @retry(retry_on_exception=retry_if_exceptions, stop_max_attempt_number=2, wait_fixed=1000)
-    def click(self, by: Literal['js', 'default', 'action'] = 'default'):
+    def click(self, by: Literal['js', 'default', 'action', 'coordinate'] = 'default'):
+        by = by.lower()
         if by == "js":
             # only support web
             if self._action.is_web_platform:
                 self._driver.execute_script("arguments[0].click();", self.elem)
                 logger.info(f"{Emoji.CHECK_MARK_BUTTON} click() by js.")
             else:
-                raise Exception(f"{Emoji.EXCEPTION} Clicking element by js only support web platform")
+                raise Exception(f"Clicking element by js only support web platform.")
         elif by == 'action':
             self.w3c_actions.pointer_action.click(self.elem)
             self.w3c_actions.perform()
             logger.info(f"{Emoji.CHECK_MARK_BUTTON} click() by action.")
+        elif by == 'coordinate':
+            # only support mobile
+            if self._action.is_web_platform:
+                raise Exception(f"Clicking element by coordinate only support mobile platform.")
+            location = self.elem.location
+            x = location['x']
+            y = location['y']
+            self._driver.tap([(x, y)])
+            logger.info(f"{Emoji.CHECK_MARK_BUTTON} click() by coordinate.")
         elif by == 'default':
             self._find_element().click()
             logger.info(f"{Emoji.CHECK_MARK_BUTTON} click().")
         else:
-            raise Exception(f"{Emoji.EXCEPTION} 'by' only support the following strategies: ['js', 'default', 'action']")
+            raise Exception(f"'by' only support the following strategies: ['js', 'default', 'action', 'coordinate']")
         return self
 
     def send_keys(self, value):

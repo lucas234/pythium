@@ -19,18 +19,16 @@ from loguru import logger
 
 class Browsers(object):
 
-    def __init__(self, execute_path=None):
-        self.execute_path = execute_path
-
-    def _get_driver_path(self, browser):
+    @staticmethod
+    def _get_driver_path(browser, execute_path=None):
         """
         利用 webdriver_manager 自动下载匹配版本的浏览器driver
         地址：https://github.com/SergeyPirogov/webdriver_manager
         :param browser: 浏览器类型 chrome、firefox、ie、edge、opera
         :return: 下载的driver绝对地址
         """
-        if self.execute_path:
-            return self.execute_path
+        if execute_path:
+            return execute_path
         # chromium_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
         browser_paths = {
             "chrome": lambda: ChromeDriverManager(),
@@ -56,15 +54,18 @@ class Browsers(object):
                                          desired_capabilities=dc, **kwargs)
         return remote_driver
 
-    def chrome(self, headless=False, options: ChromeOptions = None, mobile_emulation: dict = None, **kwargs):
-        chrome_options = self._get_chrome_options(headless, options, mobile_emulation)
-        chrome_driver = Chrome(service=ChromeService(self._get_driver_path("chrome")), options=chrome_options, **kwargs)
+    @classmethod
+    def chrome(cls, headless=False, execute_path=None, options: ChromeOptions = None, mobile_emulation: dict = None, **kwargs):
+        chrome_options = cls._get_chrome_options(headless, options, mobile_emulation)
+        chrome_driver = Chrome(service=ChromeService(cls._get_driver_path("chrome", execute_path)),
+                               options=chrome_options, **kwargs)
         logger.info(f'{Emoji.CHECK_MARK_BUTTON} started chrome successfully.')
         return chrome_driver
 
-    def firefox(self, headless=False, options: FirefoxOptions = None, **kwargs):
-        firefox_options = self._get_firefox_options(headless, options)
-        firefox_driver = Firefox(service=FirefoxService(self._get_driver_path("firefox")),
+    @classmethod
+    def firefox(cls, headless=False, execute_path=None, options: FirefoxOptions = None, **kwargs):
+        firefox_options = cls._get_firefox_options(headless, options)
+        firefox_driver = Firefox(service=FirefoxService(cls._get_driver_path("firefox", execute_path)),
                                  options=firefox_options, **kwargs)
         logger.info(f'{Emoji.CHECK_MARK_BUTTON} started firefox successfully.')
         return firefox_driver
@@ -89,6 +90,7 @@ class Browsers(object):
 
 if __name__ == '__main__':
     # mobile_emulation = {"deviceName": "iPhone 8"}
-    driver = Browsers().chrome()
+    driver = Browsers.chrome()
     driver.get("https://httpbin.org/#/")
     driver.quit()
+
