@@ -35,9 +35,6 @@ class HttpSession(Session):
         url = urljoin(self.base_url, url)
         return super(HttpSession, self).request(method, url, *args, **kwargs)
 
-    def _set_header(self, header):
-        self.headers.update(header)
-
     def _set_proxy(self, proxies):
         self.proxies.update(proxies)
 
@@ -73,7 +70,7 @@ class HttpSession(Session):
             else:
                 request_body = json.loads(response.request.body.decode('utf-8')) if response.request.body else {}
             request_headers = response.request.headers.__dict__
-            request_headers.pop('_store')
+            # request_headers.pop('_store')
             request_msg = f"\n< ### Request Info ###\n" \
                           f"< {response.request.method} {response.request.url}\n" \
                           f"< headers: {json.dumps(request_headers, indent=4, sort_keys=True)}\n" \
