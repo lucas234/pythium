@@ -1,6 +1,6 @@
 <!-- README.zh.md -->
 #### Pythium 
-[English Version](README.md) | [中文版](README.zh.md)
+[English](README.md) | [中文](README.zh.md)
 ***
 基于 Python 的 Page Factory 设计模式测试库, 类似于Java的Page Factory模式，旨在减少代码冗余，简单易用，具有高度的可扩展能力。
 

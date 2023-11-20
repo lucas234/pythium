@@ -1,6 +1,6 @@
 <!-- README.md -->
 #### Pythium 
-[English Version](README.md) | [中文版](README.zh.md)
+[English](README.md) | [中文](README.zh.md)
 
 ***
 Python based Page Factory design pattern test library, similar to Java's Page Factory pattern, 
