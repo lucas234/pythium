@@ -8,4 +8,3 @@ build/
 dist/
 venv/
 pythium.egg-info/
-test.py
