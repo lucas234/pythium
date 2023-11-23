@@ -134,6 +134,10 @@ class Page:
         logger.info(f"{Emoji.LINK} navigate to {url}.")
         return self
 
+    def wait(self, seconds=5):
+        self.action.wait(seconds)
+        return self
+
     def open_deeplink(self, link, ios_bundle_id=None):
         self.action.open_deep_link(link, ios_bundle_id)
         logger.info(f"{Emoji.LINK} open deeplink: {link}.")
@@ -155,7 +159,7 @@ class Page:
 
 
 # not for PO
-def elem_with_driver(f, driver=None):
+def falcon(f, driver=None):
     def _find_by(id_=None, css=None, name=None, xpath=None, partial_link_text=None, link_text=None,
                  class_name=None, tag_name=None, image=None, custom=None, android_uiautomator=None,
                  android_viewtag=None, android_data_matcher=None, android_view_matcher=None,
@@ -170,3 +174,6 @@ def elem_with_driver(f, driver=None):
             return func(**kwargs)
         return decorator(f)
     return _find_by
+
+
+Falcon = falcon

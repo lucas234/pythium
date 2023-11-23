@@ -57,16 +57,16 @@ class Browsers(object):
     @classmethod
     def chrome(cls, headless=False, execute_path=None, options: ChromeOptions = None, mobile_emulation: dict = None, **kwargs):
         chrome_options = cls._get_chrome_options(headless, options, mobile_emulation)
-        chrome_driver = Chrome(service=ChromeService(cls._get_driver_path("chrome", execute_path)),
-                               options=chrome_options, **kwargs)
+        service = ChromeService(cls._get_driver_path("chrome", execute_path))
+        chrome_driver = Chrome(service=service, options=chrome_options, **kwargs)
         logger.info(f'{Emoji.CHECK_MARK_BUTTON} started chrome successfully.')
         return chrome_driver
 
     @classmethod
     def firefox(cls, headless=False, execute_path=None, options: FirefoxOptions = None, **kwargs):
         firefox_options = cls._get_firefox_options(headless, options)
-        firefox_driver = Firefox(service=FirefoxService(cls._get_driver_path("firefox", execute_path)),
-                                 options=firefox_options, **kwargs)
+        service = FirefoxService(cls._get_driver_path("firefox", execute_path))
+        firefox_driver = Firefox(service=service, options=firefox_options, **kwargs)
         logger.info(f'{Emoji.CHECK_MARK_BUTTON} started firefox successfully.')
         return firefox_driver
 
@@ -80,6 +80,9 @@ class Browsers(object):
     @staticmethod
     def _get_chrome_options(headless, options, mobile_emulation):
         options = ChromeOptions() if options is None else options
+        options.add_argument('--disable-gpu')  # 禁用 GPU 加速
+        options.add_argument('--disable-extensions')  # 禁用扩展
+        options.add_argument('--disable-dev-shm-usage')  # 禁用 /dev/shm 临时文件系统
         if headless:
             options.add_argument('--headless')
         elif mobile_emulation:

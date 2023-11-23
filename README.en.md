@@ -1,44 +1,46 @@
-<!-- README.zh.md -->
+<!-- README.md -->
 #### Pythium 
 [中文](README.md) | [English](README.en.md)
 
-基于 Python 的 Page Factory 设计模式测试库, 类似于Java的Page Factory模式，旨在减少代码冗余，简单易用，具有高度的可扩展能力。
+Python based Page Factory design pattern test library, similar to Java's Page Factory pattern, 
+designed to reduce code redundancy, easy to use, are very descriptive， make the code more 
+readable and understandable and with a high degree of scalability.
 
-- 支持以@annotation的方式定义元素
-- 支持同一个元素多种定位方式
-- 支持动态的定位方式
+- Supports locate element with annotation
+- Supports multiple positioning methods for the same element
+- Supports dynamically locate element
 
-#### 安装
+#### Install
 
 `pip install pythium`
 
-#### 用法
+#### Usage
 
-1. 使用单个定位元素
+1. Using a single locator element
    - `find_by`
    - `ios_find_by`
    - `android_find_by`
    
-   `find_by`用于`Web`平台, 
+   `find_by` is used for `Web` platform, 
 
-   `ios_find_by`和`android_find_by`分别适用于苹果和安卓平台;
+   `ios_find_by` and `android_find_by` are applicable to the iOS and Android platforms respectively.
 
-   例子: `find_by(css=".search")`
+   sample: `find_by(css=".search")`
 
-2. 使用多个定位元素，元素之间为`or`的关系，按顺序查找:
+2. Use multiple locator elements with an 'or' relationship between elements, searching in order:
    - `find_all`
    - `ios_find_all`
    - `android_find_all`
    
-   例子: `@find_all(by(css=".icon-logo1"), by(id="icon"))` ;
+   sample: `@find_all(by(css=".icon-logo1"), by(id="icon"))` ;
 
-   首先查找元素 `by(css=".icon-logo1")`, 如果找到则返回 `WebElement`;
+   First, locate the element by `by(css=".icon-logo1")`; If found, return the `WebElement`.
 
-   如果没找到则通过 `by(id="icon")`继续找, 如果找到则返回`WebElement`;
+   If not found, then continue by locating the element using `by(id="icon")`. If found, return the `WebElement`.
 
-   最后没找到则抛出异常 `Exception`.
+   If still not found, throw an `Exception`.
 
-3. `Page object`代码样例:
+3. `Page object` code sample:
     ```python
     from pythium import find_by, android_find_by, ios_find_by
     from pythium import find_all, ios_find_all, android_find_all, Page, by
@@ -94,7 +96,7 @@
         # for list WebElement
         print(len(login.list_web_elements()))
     ```
-4. 非`Page object`代码样例:
+4. Not `Page object` code sample:
     ```python
     from pythium import Falcon, Element, Page
     from pythium import Browsers
@@ -110,14 +112,15 @@
     page.wait(5).expect.to_have_title("selenium_百度搜索")
     ```
 
-#### 使用自定义`Element`
-   使用自定义`Element`的好处是，不用额外的封装一些公用的方法(额外的等待、元素是否存在等)；
+#### Using a custom `Element`
 
-   **如果遇到一些无法处理的或者没有的方法，则需要根据自己的需求，继承`Element`类，定义自己的方法调用即可**
+   The advantage of using a custom Element is that there is no need to encapsulate additional common methods (extra waits, checking element existence, etc.).
 
-   使用时只需把函数返回类型定义为`Element, Elements`(`或者自定义的类名`),替换`WebElement, MobileElement`
-   
-   代码样例：
+   If there are some methods that cannot be handled or are not available, you can inherit from the Element class according to your needs and define your own methods.
+
+   When using it, simply define the return type of the function as Element or Elements (or your custom class name), replacing WebElement or MobileElement.
+
+   sample：
 
    ```python
    from pythium import find_by, find_all
@@ -169,7 +172,7 @@
        baidu.wait(5).expect.to_have_title('selenium_百度搜索')
    ```
 
-#### 元素定位参考
+#### Element locators reference
 
-- [Css 用法](./docs/locator%20cheat%20sheet/Css%20cheat%20sheet.md)
-- [Xpath 用法](./docs/locator%20cheat%20sheet/Xpath%20cheat%20sheet.md)
+- [Css usage](./docs/locator%20cheat%20sheet/Css%20cheat%20sheet.md)
+- [Xpath usage](./docs/locator%20cheat%20sheet/Xpath%20cheat%20sheet.md)
