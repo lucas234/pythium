@@ -82,3 +82,4 @@ if __name__ == '__main__':
     # print(DeviceTools.get_ios_simulators())
     # print(DeviceTools.get_android_devices())
 
+
