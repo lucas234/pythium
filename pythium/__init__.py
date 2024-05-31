@@ -8,4 +8,6 @@ from pythium._impl import by, Page, Falcon
 from pythium._impl import WebElement, MobileElement
 from pythium.objects import Element, Elements
 from pythium.browsers import Browsers
+from pythium.device_tools import DeviceTools
+from pythium.appium_desired_caps_sample import AppiumDesiredCapsSample
 
