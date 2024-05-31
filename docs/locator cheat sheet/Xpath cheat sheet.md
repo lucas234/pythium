@@ -168,5 +168,9 @@
 `//td[preceding-sibling::td[contains(.,"t")]]`
 
 按搜索结果的索引取值：`(//div[@class="g-grid"])[1]`
+定位包含特定标签子元素的祖先元素：
+- `//*[contains(@class, 'ancestor') and .//span]`
+- `//div/div[.//span]`
+
 
 

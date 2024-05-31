@@ -10,7 +10,7 @@ import os
 import json
 from functools import partial
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 from urllib.parse import urljoin, urlparse
 from loguru import logger
 
