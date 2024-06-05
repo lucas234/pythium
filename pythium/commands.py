@@ -62,7 +62,7 @@ class AndroidCommands(Commands):
 class IosCommands(Commands):
     """
     driver.execute_script('mobile: Commands', )
-    the below commands are supported(only iOS)
+    the below commands are supported (only iOS)
     """
     Tap = "tap"
     SelectPickerWheelValue = "selectPickerWheelValue"
