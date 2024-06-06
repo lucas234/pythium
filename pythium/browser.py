@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pythium
-# @File: _browser
-# @Author：Lucas Liu
-# @Time: 2022/10/14 5:21 PM
-# @Software: PyCharm
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import IEDriverManager

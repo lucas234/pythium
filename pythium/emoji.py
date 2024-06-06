@@ -1,8 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @File: emoji
-# @Author：Lucas Liu
-# @Time: 2022/8/26 3:28 PM
-# @Software: PyCharm
 
 
 class Emoji(object):

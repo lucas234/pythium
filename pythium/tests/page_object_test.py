@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pyium
-# @File: page_object_test
-# @Author：Lucas Liu
-# @Time: 2023/11/21 10:05
-# @Software: PyCharm
 from pythium import find_by, find_all
 from pythium import Page, by, Element, Elements
 from typing import Any

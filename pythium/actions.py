@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: CodeWarehouse
-# @File: actions
-# @Author：Lucas Liu
-# @Time: 2022/1/19 4:00 下午
-# @Software: PyCharm
 from appium.webdriver import Remote
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver import ActionChains

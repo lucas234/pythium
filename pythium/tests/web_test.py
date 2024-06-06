@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pyium
-# @File: test
-# @Author：Lucas Liu
-# @Time: 2023/9/15 13:37
-# @Software: PyCharm
 from pythium import Falcon, Element, Page
 from pythium import Browsers
 

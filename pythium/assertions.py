@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: helium
-# @File: assertions
-# @Author：Lucas Liu
-# @Time: 2022/10/11 10:27 AM
-# @Software: PyCharm
 from selenium.webdriver.remote.webdriver import WebDriver
 import re
 from typing import TypedDict

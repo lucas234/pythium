@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pythium
-# @File: appium_desired_caps
-# @Author：Lucas Liu
-# @Time: 2023/12/4 09:54
-# @Software: PyCharm
 import platform
 import re
 from pathlib import Path
