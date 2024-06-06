@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pyium
-# @File: device_tools
-# @Author：Lucas Liu
-# @Time: 2023/11/21 14:41
-# @Software: PyCharm
 import subprocess
 import os
 import dotenv

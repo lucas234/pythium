@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: gls.automation.python
-# @File: elem
-# @Author：Lucas Liu
-# @Time: 2022/11/25 10:55 AM
-# @Software: PyCharm
 from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotVisibleException
 from selenium.webdriver.support import expected_conditions as ec

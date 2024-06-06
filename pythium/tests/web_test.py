@@ -1,18 +1,12 @@
-# -*- coding: UTF-8 -*-
-# @Project: pyium
-# @File: test
-# @Author：Lucas Liu
-# @Time: 2023/9/15 13:37
-# @Software: PyCharm
 from pythium import Falcon, Element, Page
-from pythium import Browsers
+from pythium import Browser
 
 
 class PageTests():
 
     @staticmethod
     def hover_and_click_test():
-        driver = Browsers.chrome()
+        driver = Browser.chrome()
         Elem = Falcon(Element, driver)
         page = Page(driver)
         page.goto('http://www.baidu.com')
@@ -23,7 +17,7 @@ class PageTests():
 
     @staticmethod
     def web_test():
-        driver = Browsers.chrome()
+        driver = Browser.chrome()
         Elem = Falcon(Element, driver)
         page = Page(driver)
         page.goto('http://www.baidu.com')

@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pythium
-# @File: commands
-# @Author：Lucas Liu
-# @Time: 2023/3/8 1:44 PM
-# @Software: PyCharm
 
 
 class Commands:

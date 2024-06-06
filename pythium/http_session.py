@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: gls_automation_python
-# @File: base_session
-# @Author：Lucas Liu
-# @Time: 2021/10/8 1:24 下午
-# @Software: PyCharm
 from requests import Session, Response
 import allure
 import os

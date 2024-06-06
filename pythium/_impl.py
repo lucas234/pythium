@@ -1,6 +1,3 @@
-# @Project: pythium
-# @Author：Lucas Liu
-# @Time: 2022/10/28 9:15 AM
 from selenium.common.exceptions import NoSuchElementException
 from functools import wraps
 from appium.webdriver.webdriver import WebDriver as MobileDriver

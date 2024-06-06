@@ -1,6 +1,3 @@
-# @Project: pythium
-# @Author：Lucas Liu
-# @Time: 2022/11/15 1:53 PM
 import setuptools
 
 with open("README.md", "r", encoding="utf-8") as f:

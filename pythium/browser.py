@@ -1,9 +1,3 @@
-# -*- coding: UTF-8 -*-
-# @Project: pythium
-# @File: _browser
-# @Author：Lucas Liu
-# @Time: 2022/10/14 5:21 PM
-# @Software: PyCharm
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import IEDriverManager
@@ -17,7 +11,7 @@ from pythium.emoji import Emoji
 from loguru import logger
 
 
-class Browsers(object):
+class Browser(object):
 
     @staticmethod
     def _get_driver_path(browser, execute_path=None):
@@ -93,7 +87,7 @@ class Browsers(object):
 
 if __name__ == '__main__':
     # mobile_emulation = {"deviceName": "iPhone 8"}
-    driver = Browsers.chrome()
+    driver = Browser.chrome()
     driver.get("https://httpbin.org/#/")
     driver.quit()
 

@@ -1,8 +1,3 @@
-# @Project: pythium
-# @File: utils
-# @Author：Lucas Liu
-# @Time: 2022/12/9 9:25 AM
-# @Software: PyCharm
 import re
 import inspect
 from appium.webdriver.common.appiumby import AppiumBy

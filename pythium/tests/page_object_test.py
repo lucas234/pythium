@@ -1,13 +1,7 @@
-# -*- coding: UTF-8 -*-
-# @Project: pyium
-# @File: page_object_test
-# @Author：Lucas Liu
-# @Time: 2023/11/21 10:05
-# @Software: PyCharm
 from pythium import find_by, find_all
 from pythium import Page, by, Element, Elements
 from typing import Any
-from pythium import Browsers
+from pythium import Browser
 
 
 class BaiDuPage(Page):
@@ -43,7 +37,7 @@ class BaiDuPage(Page):
 
 
 if __name__ == '__main__':
-    driver = Browsers().chrome()
+    driver = Browser().chrome()
     baidu = BaiDuPage(driver)
     baidu.goto("https://www.baidu.com/")
     print(baidu.list_elements.index(0).text)
