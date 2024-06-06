@@ -11,7 +11,7 @@ from pythium.emoji import Emoji
 from loguru import logger
 
 
-class Browsers(object):
+class Browser(object):
 
     @staticmethod
     def _get_driver_path(browser, execute_path=None):
@@ -87,7 +87,7 @@ class Browsers(object):
 
 if __name__ == '__main__':
     # mobile_emulation = {"deviceName": "iPhone 8"}
-    driver = Browsers.chrome()
+    driver = Browser.chrome()
     driver.get("https://httpbin.org/#/")
     driver.quit()
 

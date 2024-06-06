@@ -1,12 +1,12 @@
 from pythium import Falcon, Element, Page
-from pythium import Browsers
+from pythium import Browser
 
 
 class PageTests():
 
     @staticmethod
     def hover_and_click_test():
-        driver = Browsers.chrome()
+        driver = Browser.chrome()
         Elem = Falcon(Element, driver)
         page = Page(driver)
         page.goto('http://www.baidu.com')
@@ -17,7 +17,7 @@ class PageTests():
 
     @staticmethod
     def web_test():
-        driver = Browsers.chrome()
+        driver = Browser.chrome()
         Elem = Falcon(Element, driver)
         page = Page(driver)
         page.goto('http://www.baidu.com')
