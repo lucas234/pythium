@@ -67,7 +67,7 @@ def _appium_find_by(platform):
             def wrapped_func(*args, **kwargs):
                 func_kwargs = Utils.get_func_kwargs(args[1:], kwargs, func)
                 locator = (_by, value.format(**func_kwargs)), {key: value}
-                if args[0].action.is_platform(platform):
+                if args[0].action.is_mobile(platform):
                     args[0].locators[func.__name__] = locator[0]
                     return_type = inspect.signature(func).return_annotation
                     return _handle_return_type(return_type, args[0].driver, locator)
@@ -145,7 +145,22 @@ class Page:
 
     @property
     def expect(self) -> PageAssertions:
+        logger.info(f"{Emoji.ASSERT} Start to page assertions.")
         return PageAssertions(self.driver)
+
+    @property
+    def new_tab(self):
+        self.driver.switch_to.new_window('tab')
+        return self
+
+    @property
+    def new_window(self):
+        self.driver.switch_to.new_window('window')
+        return self
+
+    @property
+    def switch_to(self):
+        return self.driver.switch_to
 
     @property
     def request(self):
@@ -156,6 +171,10 @@ class Page:
     def _get_cookies(self) -> dict:
         cookies = {cookie['name']: cookie['value'] for cookie in self.driver.get_cookies()}
         return cookies
+
+    def quit(self):
+        self.driver.quit()
+        return self
 
 
 # not for PO

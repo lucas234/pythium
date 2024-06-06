@@ -6,23 +6,29 @@
 # @Software: PyCharm
 from appium.webdriver import Remote
 from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
+                                        ElementNotInteractableException, InvalidSelectorException)
 from typing import NoReturn
 import inspect
 import time
 from typing import Literal
+from loguru import logger
 from pythium.exceptions import IllegalArgumentException
 from pythium.utils import Utils
+from pythium.emoji import Emoji
 from pythium.commands import IosCommands, AndroidCommands
 
 
 class Actions(object):
 
     _TIMEOUT = 8
+    I_EXCEPTIONS = [NoSuchElementException, ElementNotInteractableException]
 
     def __init__(self, driver: Remote):
         self._driver = driver
+        self.action_chains = ActionChains(driver)
 
     def wait_util(self, locator, ecs, timeout=_TIMEOUT, throw_exception=True):
         try:
@@ -30,15 +36,14 @@ class Actions(object):
         except TimeoutException as te:
             if throw_exception:
                 raise te
-            print(te)
+            logger.info(te)
 
     def is_(self, locator, ecs, timeout=_TIMEOUT):
         try:
-            WebDriverWait(self._driver, timeout).until(ecs(locator))
-
+            WebDriverWait(self._driver, timeout, ignored_exceptions=self.I_EXCEPTIONS).until(ecs(locator))
             return True
         except TimeoutException as te:
-            print(te)
+            logger.info(te)
             return False
 
     @property
@@ -47,13 +52,13 @@ class Actions(object):
 
     @property
     def is_ios_platform(self):
-        return self.is_platform('ios')
+        return self.is_mobile('ios')
 
     @property
     def is_android_platform(self):
-        return self.is_platform('android')
+        return self.is_mobile('android')
 
-    def is_platform(self, platform: Literal['ios', 'android']):
+    def is_mobile(self, platform: Literal['ios', 'android']):
         return self._driver.capabilities['platformName'].lower() == platform
 
     @property
@@ -89,6 +94,45 @@ class Actions(object):
             msg = f"Only support the platforms: ['ios', 'android']!"
             raise IllegalArgumentException(msg)
 
+    def is_in_view(self, locator, top_offset=100, bottom_offset=100):
+        script = """
+            var elem = arguments[0];
+            var bounding = elem.getBoundingClientRect();
+            return (
+                bounding.top >= 0 &&
+                bounding.left >= 0 &&
+                bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        """
+        if self.is_web_platform:
+            element = self._driver.find_element(*locator)
+            _is_in_view = self._driver.execute_script(script, element)
+            return _is_in_view
+        else:
+            _is_in_view = self.is_in_view_mobile(locator, top_offset, bottom_offset)
+        return _is_in_view
+
+    def is_in_view_mobile(self, locator, top_offset=100, bottom_offset=100):
+        screen_size = self._driver.get_window_size()
+        logger.info(f"{Emoji.DESKTOP} screen size: {screen_size}")
+        screen_height = screen_size['height']
+        screen_width = screen_size['width']
+
+        def location():
+            try:
+                _location = self._driver.find_element(*locator).rect
+                logger.info(f"{Emoji.MAP} current location: {_location}")
+                return _location['x'], _location['y'], _location['width'], _location['height']
+            except InvalidSelectorException as e:
+                raise Exception(e)
+            except Exception as e:
+                _ = e
+                return 0, 0, 0, 0
+
+        _x, _y, _width, _height = location()
+        return top_offset < _y < screen_height - bottom_offset and _x > 0 and _x + _width <= screen_width
+
     def swipe(self, direction: Literal["up", "down", "left", "right"], duration=800) -> NoReturn:
         sizes = tuple(self._driver.get_window_size().values())
         top_x = down_x = int(sizes[0] * 0.5)
@@ -109,51 +153,30 @@ class Actions(object):
         self._driver.swipe(*lines.get(direction.lower()), duration)
 
     def scroll_into_view(self, locator, direction='down', swipe_max_times=5, top_offset=100, bottom_offset=100):
-        size = self._driver.get_window_size()
-        print(f"screen size is: {size}")
-        height = size['height']
+        count = 0
 
-        def location():
-            try:
-                _location = self._driver.find_element(*locator).location
-                return _location['x'], _location['y']
-            except Exception as e:
-                _ = e
-                return 0, 0
-
-        def is_into_view():
-            _x, _y = location()
-            print(_x, _y)
-            return top_offset < _y < height - bottom_offset and _x > 0
-
-        def _swipe(direction_):
-            for i in range(swipe_max_times):
-                if is_into_view():
-                    print(f"locator is into view: {locator}")
+        def _swipe(direction_, times):
+            nonlocal count
+            for i in range(times):
+                if self.is_in_view(locator, top_offset, bottom_offset):
+                    rect = self._driver.find_element(*locator).rect
+                    x = rect['x']
+                    y = rect['y']
+                    screen_height = self._driver.get_window_size()["height"]
+                    if y > int(screen_height * 3 / 4):
+                        self._driver.swipe(x, int(screen_height/2)+150, x, int(screen_height/2))
+                    if int(screen_height / 4) > y:
+                        self._driver.swipe(x, int(screen_height/2), x, int(screen_height/2)+150)
                     return
-                x, y = location()
-                self.swipe(direction_)
-                new_x, new_y = location()
-                if y == new_y and all([x, y, new_x, new_y]):
-                    break
+                else:
+                    count += 1
+                    self.swipe(direction_)
 
         reverse = {"down": "up", "up": "down"}
-        _swipe(direction)
-        if not is_into_view():
-            _swipe(reverse[direction])
-
-    def scroll_into_view_ios(self, locator):
-        self._driver.find_element(*locator).click()
-        self.wait(1)
-        try:
-            y = self._driver.find_element(*locator).rect['y']
-            height = self._driver.get_window_size()["height"]
-            if y > int(height*3/4):
-                self.swipe('down')
-            if int(height/4) > y:
-                self.swipe('up')
-        except NoSuchElementException:
-            pass
+        _swipe(direction, swipe_max_times)
+        if not self.is_in_view(locator, top_offset, bottom_offset):
+            _swipe(reverse[direction], swipe_max_times*2)
+        logger.info(f"{Emoji.CHECK_MARK_BUTTON} After swiping {count} time(s), locator is into view: {locator}")
 
     def open_deep_link(self, link: str, ios_bundle_id=None):
         """
@@ -179,7 +202,7 @@ class Actions(object):
         if self.is_ios_platform:
             self._driver.execute_script(f'mobile: {IosCommands.TerminateApp}', {"bundleId": bundle_id})
             # on ios platform, driver.get(link) only can use emulator
-            # on real device, need to use other method
+            # on a real device, need to use another method
             is_simulator = self._driver.execute_script(f'mobile: {IosCommands.DeviceInfo}')['isSimulator']
             if is_simulator:
                 self._driver.get(f'{bundle_id}://{Utils.remove_scheme(link)}')
@@ -231,4 +254,3 @@ class Actions(object):
     @classmethod
     def wait(cls, seconds=5):
         time.sleep(seconds)
-

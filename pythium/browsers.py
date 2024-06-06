@@ -59,7 +59,7 @@ class Browsers(object):
         chrome_options = cls._get_chrome_options(headless, options, mobile_emulation)
         service = ChromeService(cls._get_driver_path("chrome", execute_path))
         chrome_driver = Chrome(service=service, options=chrome_options, **kwargs)
-        logger.info(f'{Emoji.CHECK_MARK_BUTTON} started chrome successfully.')
+        logger.info(f'{Emoji.RUN} started chrome successfully.')
         return chrome_driver
 
     @classmethod
@@ -67,7 +67,7 @@ class Browsers(object):
         firefox_options = cls._get_firefox_options(headless, options)
         service = FirefoxService(cls._get_driver_path("firefox", execute_path))
         firefox_driver = Firefox(service=service, options=firefox_options, **kwargs)
-        logger.info(f'{Emoji.CHECK_MARK_BUTTON} started firefox successfully.')
+        logger.info(f'{Emoji.RUN} started firefox successfully.')
         return firefox_driver
 
     @staticmethod

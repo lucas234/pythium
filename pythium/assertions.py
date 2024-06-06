@@ -141,6 +141,13 @@ class ElemAssertions(BaseAssertions):
     def not_to_be_visible(self):
         self._not.to_be_visible()
 
+    def to_be_in_view(self):
+        in_view = self._elem.is_in_view()
+        self._expect_impl(in_view, "Elem expected to be in view")
+
+    def not_to_be_in_view(self):
+        self._not.to_be_in_view()
+
     def to_contain_text(self, expected):
         text = self._elem.text
         self._expect_impl(text,  "Elem expected to contain text:", ExpectOptions(expected_text=expected, is_contain=True))

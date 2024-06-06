@@ -47,6 +47,7 @@ if __name__ == '__main__':
     baidu = BaiDuPage(driver)
     baidu.goto("https://www.baidu.com/")
     print(baidu.list_elements.index(0).text)
+    # baidu.search_input.send_keys("selenium")
     baidu.search_input.send_keys("selenium")
     # baidu.search_input_no_property().send_keys("selenium")
     baidu.search_button.click()

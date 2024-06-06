@@ -23,6 +23,7 @@ class Emoji(object):
     HOURGLASS_NOT_DONE = '\U000023F3'
     # TIME: '\U000023F0', '\U000023F1', '\U0001F570'
     TIMEOUT = '\U000023F0'
+    MOUSE = '\U0001f5b1\ufe0f'
     # BUG: '\U0001F41B', '\U0001F41E'
     BUG = '\U0001F41B'
     # WARNING: '\u26a0\ufe0f', '\U00002757'
@@ -35,6 +36,9 @@ class Emoji(object):
     OFF = '\U0001f4f4'
     TEXT = '\U0001f4d6'
     RUN = '\U0001F7E2'
+    ASSERT = '\U0001f19a'
+    MAP = '\U0001f5fa'
+    DESKTOP = '\U0001f5a5\ufe0f'
 
 
 if __name__ == '__main__':
@@ -43,3 +47,5 @@ if __name__ == '__main__':
     print('\U00002402,\U00002403 Find')
     print("🚧")
     print("\U0001f4dd")
+    print(Emoji.RUN)
+    print("\U0001f19a")
