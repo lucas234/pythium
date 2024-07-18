@@ -4,19 +4,12 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webdriver import WebDriver
 from appium.webdriver.webdriver import WebDriver as MobileDriver
-from retrying import retry
 from typing import Literal, Union
 from loguru import logger
 from pythium.utils import Utils
 from pythium.actions import Actions
 from pythium.assertions import ElemAssertions, ElemsAssertions
 from pythium.emoji import Emoji
-
-
-def retry_if_exceptions(exception):
-    exceptions = [ElementClickInterceptedException, StaleElementReferenceException,
-                  ElementNotVisibleException, NoSuchElementException]
-    return any([isinstance(exception, e) for e in exceptions])
 
 
 class Elements:
@@ -46,26 +39,23 @@ class Elements:
     def elems(self):
         return self._find_elements()
 
-    def _find_elements(self, timeout=_TIMEOUT):
+    def _find_elements(self, timeout=_TIMEOUT, times=3):
         by, value = self._locator
-        try:
-            elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_all_elements_located(self._locator))
+        elem = None
+        for i in range(times):
+            try:
+                elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_all_elements_located(self._locator))
+                logger.info(f"{Emoji.FIND_LEFT} Find element: {by}='{value}'.")
+                return elem
+            except TimeoutException:
+                logger.info(f"{Emoji.EXCEPTION} Elems({by}='{value}') not found after {timeout}s. Will try again.")
+        if not elem:
             logger.info(f"{Emoji.FIND_LEFT} Find element: {by}='{value}'.")
-            return elem
-        except TimeoutException as te:
-            logger.exception(te)
             elem = self._driver.find_elements(*self._locator)
-            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}='{value}'.")
-            return elem
-        except NoSuchElementException as nse:
-            logger.exception(nse)
-            elem = self._driver.find_elements(*self._locator)
-            logger.info(f"{Emoji.FIND_LEFT} Find element: {by}='{value}'.")
             return elem
 
     @property
     def expect(self) -> ElemsAssertions:
-        logger.info(f"{Emoji.ASSERT} Start to element assertions.")
         return ElemsAssertions(self)
 
     @property
@@ -128,26 +118,22 @@ class Element:
 
     @property
     def expect(self) -> ElemAssertions:
-        logger.info(f"{Emoji.ASSERT} Start to element assertions.")
         return ElemAssertions(self)
 
-    def _find_element(self, timeout=_TIMEOUT):
+    def _find_element(self, timeout=_TIMEOUT, times=3):
         by, value = self._locator
-        try:
-            elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_element_located(self._locator))
+        elem = None
+        for i in range(times):
+            try:
+                elem = WebDriverWait(self._driver, timeout).until(ec.presence_of_element_located(self._locator))
+                logger.info(f"{Emoji.FIND_LEFT} Find element: {by}='{value}'.")
+                self._action.highlight(elem)
+                return elem
+            except TimeoutException:
+                logger.info(f"{Emoji.EXCEPTION} Elem({by}='{value}') not found after {timeout}s. Will try again.")
+        if not elem:
             logger.info(f"{Emoji.FIND_LEFT} Find element: {by}='{value}'.")
-            self._action.highlight(elem)
-            return elem
-        except TimeoutException as te:
-            logger.exception(te)
             elem = self._driver.find_element(*self._locator)
-            logger.info(f"{Emoji.FIND_LEFT} Find element(timeout): {by}='{value}'.")
-            self._action.highlight(elem)
-            return elem
-        except NoSuchElementException as nse:
-            logger.exception(nse)
-            elem = self._driver.find_element(*self._locator)
-            logger.info(f"{Emoji.FIND_LEFT} Find element(no_such): {by}='{value}'.")
             self._action.highlight(elem)
             return elem
 
@@ -202,7 +188,6 @@ class Element:
     def hover(self, timeout=_TIMEOUT):
         self._action.action_chains.move_to_element(self._find_element(timeout)).perform()
 
-    @retry(retry_on_exception=retry_if_exceptions, stop_max_attempt_number=2, wait_fixed=1000)
     def click(self, by: Literal['js', 'default', 'action', 'coordinate'] = 'default', timeout=_TIMEOUT):
         by = by.lower()
         if by == "js":
@@ -225,7 +210,7 @@ class Element:
             self._driver.tap([(x, y)])
             logger.info(f"{Emoji.MOUSE} click() by coordinate.")
         elif by == 'default':
-            self._find_element().click()
+            self._find_element(timeout).click()
             logger.info(f"{Emoji.MOUSE} click().")
         else:
             raise Exception(f"'by' only support the following strategies: ['js', 'default', 'action', 'coordinate']")

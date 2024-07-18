@@ -2,7 +2,7 @@ from pythium import Falcon, Element, Page
 from pythium import Browser
 
 
-class PageTests():
+class PageTests:
 
     @staticmethod
     def hover_and_click_test():
@@ -17,14 +17,15 @@ class PageTests():
 
     @staticmethod
     def web_test():
-        driver = Browser.chrome()
+        driver = Browser.firefox()
         Elem = Falcon(Element, driver)
         page = Page(driver)
-        page.goto('http://www.baidu.com')
+        page.goto('https://www.baidu.com')
         Elem(id_="kw").send_keys("selenium")
-        Elem(id_='su').click('action')
-        print(Elem(id_='su').get_property('value'))
-        Elem(id_='su').expect.to_be_enable()
+        btn = Elem(id_='su')
+        btn.click('action')
+        print(btn.get_property('value'))
+        btn.expect.to_be_enable()
         page.wait(5).expect.to_have_title("selenium_百度搜索")
         page = Elem(id_='page')
         print(page.is_in_view())
