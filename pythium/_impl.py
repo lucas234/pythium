@@ -142,7 +142,6 @@ class Page:
 
     @property
     def expect(self) -> PageAssertions:
-        logger.info(f"{Emoji.ASSERT} Start to page assertions.")
         return PageAssertions(self.driver)
 
     @property

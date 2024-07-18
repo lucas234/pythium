@@ -1,6 +1,8 @@
 from selenium.webdriver.remote.webdriver import WebDriver
 import re
+from loguru import logger
 from typing import TypedDict
+from pythium.emoji import Emoji
 
 
 class ExpectOptions(TypedDict, total=False):
@@ -32,6 +34,7 @@ class BaseAssertions(object):
             message = message.replace("expected to", "expected not to")
             result = not result
         expected = expected or expected_number
+        logger.info(f"{Emoji.ASSERT} Start to assert, {message} {expected if expected else ''}, the actual is: {actual}")
         assert result, f"{message} {expected if expected else ''}, the actual is: {actual}"
 
 
@@ -88,84 +91,84 @@ class ElemAssertions(BaseAssertions):
 
     def to_be_checked(self):
         checked = self._elem.is_selected()
-        self._expect_impl(checked, "Elem expected to be checked")
+        self._expect_impl(checked, f"Elem{self._elem._locator} expected to be checked")
 
     def not_to_be_checked(self):
         self._not.to_be_checked()
 
     def to_be_disabled(self):
         disable = not self._elem.elem.is_enabled()
-        self._expect_impl(disable, "Elem expected to be disable")
+        self._expect_impl(disable, f"Elem{self._elem._locator} expected to be disable")
 
     def not_to_be_disable(self):
         self._not.to_be_disabled()
 
     def to_be_editable(self):
         editable = self._elem.elem.is_enabled()
-        self._expect_impl(editable, "Elem expected to be editable")
+        self._expect_impl(editable, f"Elem{self._elem._locator} expected to be editable")
 
     def not_to_be_editable(self):
         self._not.to_be_editable()
 
     def to_be_empty(self):
         empty = self._elem.elem.get_property('textContent')
-        self._expect_impl(bool(empty), "Elem expected to be empty")
+        self._expect_impl(bool(empty), f"Elem{self._elem._locator} expected to be empty")
 
     def not_to_be_empty(self):
         self._not.to_be_empty()
 
     def to_be_enable(self):
         enable = self._elem.elem.is_enabled()
-        self._expect_impl(enable, "Elem expected to be enable")
+        self._expect_impl(enable, f"Elem{self._elem._locator} expected to be enable")
 
     def not_to_be_enable(self):
         self._not.to_be_enable()
 
     def to_be_exist(self):
         exist = self._elem.is_exist()
-        self._expect_impl(exist, "Elem expected to be exist")
+        self._expect_impl(exist, f"Elem{self._elem._locator} expected to be exist")
 
     def not_to_be_exist(self):
         self._not.to_be_exist()
 
     def to_be_visible(self):
         visible = self._elem.is_visible()
-        self._expect_impl(visible, "Elem expected to be visible")
+        self._expect_impl(visible, f"Elem{self._elem._locator} expected to be visible")
 
     def not_to_be_visible(self):
         self._not.to_be_visible()
 
     def to_be_in_view(self):
         in_view = self._elem.is_in_view()
-        self._expect_impl(in_view, "Elem expected to be in view")
+        self._expect_impl(in_view, f"Elem{self._elem._locator} expected to be in view")
 
     def not_to_be_in_view(self):
         self._not.to_be_in_view()
 
     def to_contain_text(self, expected):
         text = self._elem.text
-        self._expect_impl(text,  "Elem expected to contain text:", ExpectOptions(expected_text=expected, is_contain=True))
+        self._expect_impl(text,  f"Elem{self._elem._locator} expected to contain text:", ExpectOptions(expected_text=expected, is_contain=True))
 
     def not_to_contain_text(self, expected):
         self._not.to_contain_text(expected)
 
     def to_have_attribute(self, name, value):
         attribute = self._elem.get_attribute(name)
-        self._expect_impl(attribute,  "Elem expected to attribute:", ExpectOptions(expected_text=value))
+        self._expect_impl(attribute,  f"Elem{self._elem._locator} expected to attribute:", ExpectOptions(expected_text=value))
 
     def not_to_have_attribute(self, name, value):
         self._not.to_have_attribute(name, value)
 
     def to_have_class(self, expected):
         class_ = self._elem.get_attribute('class')
-        self._expect_impl(class_,  "Elem expected to class_:", ExpectOptions(expected_text=expected))
+        self._expect_impl(class_,  f"Elem{self._elem._locator} expected to class_:", ExpectOptions(expected_text=expected))
 
     def not_to_have_class(self, expected):
         self._not.to_have_class(expected)
 
     def to_have_text(self, expected):
         text = self._elem.text
-        self._expect_impl(text, "Elem expected to have text:", ExpectOptions(expected_text=expected, is_contain=False))
+        self._expect_impl(text, f"Elem{self._elem._locator} expected to have text:", ExpectOptions(expected_text=expected, is_contain=False))
 
     def not_to_have_text(self, expected):
         self._not.to_have_text(expected)
