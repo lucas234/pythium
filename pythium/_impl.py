@@ -161,10 +161,10 @@ class Page:
     @property
     def request(self):
         session = HttpSession()
-        session.cookies.update(self._get_cookies())
+        session.cookies.update(self.get_cookies())
         return session
 
-    def _get_cookies(self) -> dict:
+    def get_cookies(self) -> dict:
         cookies = {cookie['name']: cookie['value'] for cookie in self.driver.get_cookies()}
         return cookies
 
