@@ -5,9 +5,10 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 version = os.getenv("PACKAGE_VERSION", "1.1.4")
+project_name = os.getenv("PROJECT_NAME", "pythium")
 
 setuptools.setup(
-    name="pythium",
+    name=project_name,
     version=version,
     author="lucas",
     author_email="ly_liubo@163.com",

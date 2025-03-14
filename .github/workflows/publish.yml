@@ -7,6 +7,10 @@ on:
         description: "Package version (e.g., 1.2.3)"
         required: true
         default: "1.0.0"
+      project_name:
+        description: 'Project Name'
+        required: true
+        default: 'pythium'
       target:
         description: "Target repository: pypi or testpypi"
         required: true
@@ -34,9 +38,10 @@ jobs:
         pip install build
         pip install wheel  # 确保安装 wheel
 
-    - name: 📦 Set package version
+    - name: 📦 Set package version and project name
       id: set_version
       run: |
+        echo "PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
         echo "PACKAGE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
         echo "TARGET_REPO=${{ github.event.inputs.target }}" >> $GITHUB_ENV
         echo "Package version: $PACKAGE_VERSION"
