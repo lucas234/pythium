@@ -18,13 +18,13 @@ setuptools.setup(
     zip_safe=False,
     license='MIT',
     install_requires=[
-        'selenium～=4.1',
-        'Appium-Python-Client～=2.7.1',
-        'retrying～=1.3.4',
-        'requests～=2.31.0',
-        'allure-python-commons～=2.9.43',
-        'loguru～=0.5.3',
-        'webdriver-manager～=4.0.0'
+        'selenium>=4.1',
+        'Appium-Python-Client>=2.7.1',
+        'retrying>=1.3.4',
+        'requests>=2.31.0',
+        'allure-python-commons>=2.9.43',
+        'loguru>=0.5.3',
+        'webdriver-manager>=4.0.0'
     ],
     packages=['pythium'],
     python_requires=">=3",
