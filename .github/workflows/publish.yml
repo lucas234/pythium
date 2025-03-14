@@ -14,7 +14,7 @@ on:
       target:
         description: "Target repository: pypi or testpypi"
         required: true
-        default: "testpypi"
+        default: "pypi"
         type: choice
         options:
           - pypi
