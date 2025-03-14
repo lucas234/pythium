@@ -1,0 +1,57 @@
+name: Manual Publish to PyPI or Test PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Package version (e.g., 1.2.3)"
+        required: true
+        default: "1.0.0"
+      target:
+        description: "Target repository: pypi or testpypi"
+        required: true
+        default: "testpypi"
+        type: choice
+        options:
+          - pypi
+          - testpypi
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 🔨 Install build tools
+      run: |
+        pip install build
+
+    - name: 📦 Set package version
+      id: set_version
+      run: |
+        echo "PACKAGE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "TARGET_REPO=${{ github.event.inputs.target }}" >> $GITHUB_ENV
+        echo "Package version: $PACKAGE_VERSION"
+        echo "Target repo: $TARGET_REPO"
+
+    # 如果 setup.py 方式（动态版本号）
+    - name: 🚀 Build package
+      run: |
+        python setup.py sdist bdist_wheel
+
+    # 使用 pyproject.toml 的话换成：
+    # - name: 🚀 Build package
+    #   run: python -m build
+
+    - name: 📤 Publish to selected PyPI (test or prod)
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ env.TARGET_REPO == 'testpypi' && secrets.TEST_PYPI_API_TOKEN || secrets.PYPI_API_TOKEN }}
+        repository-url: ${{ env.TARGET_REPO == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
